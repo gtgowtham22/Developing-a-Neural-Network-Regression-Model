@@ -1,4 +1,3 @@
-<img width="181" height="117" alt="Screenshot 2026-03-22 102133" src="https://github.com/user-attachments/assets/1738cedd-e76e-4c61-a549-2d8209645e22" />
 # Developing a Neural Network Regression Model
 
 ## AIM
@@ -8,7 +7,8 @@ To develop a neural network regression model for the given dataset.
 Explain the problem statement
 
 ## Neural Network Model
-Include the neural network model diagram.
+<img width="1082" height="546" alt="546060726-cc3d99c0-5c33-4092-a242-00398dcb3334" src="https://github.com/user-attachments/assets/837e3489-3c2b-49bd-975a-95997e01cfde" />
+
 
 ## DESIGN STEPS
 ### STEP 1: 
@@ -43,28 +43,109 @@ Evaluate the model with the testing data.
 
 Use the trained model to predict  for a new input value .
 
-## PROGRAM
+## PROGRAM:
+
+
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+     
+
+dataset1 = pd.read_csv('DL-Exp1 - Sheet1.csv')
+X = dataset1[['Input']].values
+y = dataset1[['Output']].values
+     
+
+print(dataset1.head(5))
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=33)
+     
+
+scaler = MinMaxScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+     
+
+X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
+y_train_tensor = torch.tensor(y_train, dtype=torch.float32).view(-1, 1)
+X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
+y_test_tensor = torch.tensor(y_test, dtype=torch.float32).view(-1, 1)
+     
+
+# Name:SAJEN MURALI
+# Register Number:212223220089
+class NeuralNet(nn.Module):
+  def __init__(self):
+        super().__init__()
+        self.fc1=nn.Linear(1,8)
+        self.fc2=nn.Linear(8,10)
+        self.fc3=nn.Linear(10,1)
+        self.relu=nn.ReLU()
+        self.history={'loss': []}
+
+  def forward(self,x):
+        x=self.relu(self.fc1(x))
+        x=self.relu(self.fc2(x))
+        x=self.fc3(x)
+        return x
+     
+
+# Initialize the Model, Loss Function, and Optimizer
+ai_brain=NeuralNet()
+criterion=nn.MSELoss()
+optimizer=optim.RMSprop(ai_brain.parameters(),lr=0.001)
+     
+
+def train_model(ai_brain, X_train, y_train, criterion, optimizer, epochs=2000):
+  for epoch in range(epochs):
+    optimizer.zero_grad()
+    loss=criterion(ai_brain(X_train),y_train)
+    loss.backward()
+    optimizer.step()
+
+
+    ai_brain.history['loss'].append(loss.item())
+    if epoch % 200 == 0:
+      print(f'Epoch [{epoch}/{epochs}], Loss: {loss.item():.6f}')
+
+     
+
+train_model(ai_brain, X_train_tensor, y_train_tensor, criterion, optimizer)
+
+
+with torch.no_grad():
+    test_loss = criterion(ai_brain(X_test_tensor), y_test_tensor)
+    print(f'Test Loss: {test_loss.item():.6f}')
+
+     
+Test Loss: 324.846680
+
+loss_df = pd.DataFrame(ai_brain.history)
+     
+
+import matplotlib.pyplot as plt
+loss_df.plot()
+plt.xlabel("Epochs")
+plt.ylabel("Loss")
+plt.title("Loss during Training")
+plt.show()
+     
+
+
+X_n1_1 = torch.tensor([[9]], dtype=torch.float32)
+prediction = ai_brain(torch.tensor(scaler.transform(X_n1_1), dtype=torch.float32)).item()
+print(f'Prediction: {prediction}')
+
+
 
 ### Name:GOWTHAM G T
 
 ### Register Number:212224110017
 
-```python
-class NeuralNet(nn.Module):
-    def __init__(self):
-        super().__init__()
-        #Include your code here
 
-
-
-# Initialize the Model, Loss Function, and Optimizer
-
-
-
-def train_model(ai_brain, X_train, y_train, criterion, optimizer, epochs=2000):
-    #Include your code here
-
-```
 
 ### Dataset Information
 <img width="207" height="173" alt="Screenshot 2026-04-27 083046" src="https://github.com/user-attachments/assets/b2ec682a-7c24-43c2-a2e7-e7c0a3e9da8a" />
